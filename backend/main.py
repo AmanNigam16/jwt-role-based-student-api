@@ -88,33 +88,28 @@ def update_student(name: str, body: dict, user=Depends(verify_token)):
 
 @app.get("/screenshot")
 def capture(url: str):
-
     try:
         with sync_playwright() as p:
-            
+
             browser = p.chromium.launch(
                 headless=True,
                 args=[
                     "--no-sandbox",
                     "--disable-setuid-sandbox",
+                    "--disable-dev-shm-usage",
                     "--disable-blink-features=AutomationControlled"
                 ]
             )
-        
+
             context = browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36",
-            viewport={"width": 1280, "height": 800},
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36",
+                viewport={"width": 1280, "height": 800}
             )
 
             page = context.new_page()
 
-            # consistent screenshot size
-            page.set_viewport_size({"width": 1280, "height": 800})
-
-            # safer loading for heavy JS sites
             page.goto(url, wait_until="domcontentloaded", timeout=60000)
 
-            # allow dynamic content to load
             page.wait_for_timeout(3000)
 
             screenshot = page.screenshot(full_page=True)
@@ -126,4 +121,5 @@ def capture(url: str):
         return {"image": encoded}
 
     except Exception as e:
+        print("SCREENSHOT ERROR:", str(e))
         raise HTTPException(status_code=500, detail=str(e))
