@@ -15,7 +15,8 @@ function Login({ setToken }) {
       localStorage.setItem("token", res.data.token);
 
     } catch (err) {
-      alert("Invalid email or password");
+        console.error("Login error:", err.response?.data || err.message);
+        alert("Invalid email or password");
     }
   };
 
