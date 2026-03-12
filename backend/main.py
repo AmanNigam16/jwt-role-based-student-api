@@ -20,8 +20,12 @@ app.add_middleware(
 )
 
 security = HTTPBearer()
-
 SECRET = "secret123"
+
+
+@app.get("/")
+def root():
+    return {"status": "API running"}
 
 
 def verify_token(token=Depends(security)):
@@ -36,7 +40,6 @@ def signup(user: dict):
         raise HTTPException(status_code=400, detail="User already exists")
 
     user["password"] = hash_password(user["password"])
-
     users.insert_one(user)
 
     return {"message": "User created"}
@@ -88,6 +91,7 @@ def update_student(name: str, body: dict, user=Depends(verify_token)):
 
 @app.get("/screenshot")
 def capture(url: str):
+
     try:
         with sync_playwright() as p:
 
@@ -97,6 +101,7 @@ def capture(url: str):
                     "--no-sandbox",
                     "--disable-setuid-sandbox",
                     "--disable-dev-shm-usage",
+                    "--disable-gpu",
                     "--disable-blink-features=AutomationControlled"
                 ]
             )
@@ -108,9 +113,20 @@ def capture(url: str):
 
             page = context.new_page()
 
+            # hide webdriver detection
+            page.add_init_script("""
+                Object.defineProperty(navigator, 'webdriver', {
+                    get: () => undefined
+                })
+            """)
+
             page.goto(url, wait_until="domcontentloaded", timeout=60000)
 
+            # allow dynamic content to load
             page.wait_for_timeout(3000)
+
+            # scroll page for lazy-loaded content
+            page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
 
             screenshot = page.screenshot(full_page=True)
 
@@ -121,5 +137,5 @@ def capture(url: str):
         return {"image": encoded}
 
     except Exception as e:
-        print("SCREENSHOT ERROR:", str(e))
+        print("SCREENSHOT ERROR:", e)
         raise HTTPException(status_code=500, detail=str(e))
