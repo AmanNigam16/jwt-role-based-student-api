@@ -70,3 +70,62 @@ body {
   color: #333;
 }
 
+
+
+
+
+
+
+
+/* URL capture section */
+
+.capture-box {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.capture-box input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.capture-box button {
+  padding: 8px 12px;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.capture-box button:hover {
+  background: #3730a3;
+}
+
+/* screenshot preview */
+
+.preview-container {
+  margin-bottom: 20px;
+}
+
+.preview-window {
+  width: 100%;
+  height: 300px;
+  overflow-y: auto;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #111;
+}
+
+.preview-window img {
+  width: 100%;
+  display: block;
+}
+
+.loading-text {
+  font-size: 13px;
+  margin-bottom: 10px;
+}
