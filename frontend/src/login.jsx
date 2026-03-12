@@ -4,13 +4,26 @@ import "./App.css";
 
 function Login({ setToken }) {
 
-  const [email,setEmail] = useState("");
-  const [password,setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const login = async () => {
-    const res = await API.post("/login",{email,password});
-    setToken(res.data.token);
-    localStorage.setItem("token",res.data.token);
+    try {
+      const res = await API.post("/login", { email, password });
+
+      setToken(res.data.token);
+      localStorage.setItem("token", res.data.token);
+
+    } catch (err) {
+      alert("Invalid email or password");
+    }
+  };
+
+  // ENTER KEY SUPPORT
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      login();
+    }
   };
 
   return (
@@ -20,13 +33,16 @@ function Login({ setToken }) {
 
       <input
         placeholder="Email"
-        onChange={(e)=>setEmail(e.target.value)}
+        autoFocus
+        onChange={(e) => setEmail(e.target.value)}
+        onKeyDown={handleKeyDown}
       />
 
       <input
         type="password"
         placeholder="Password"
-        onChange={(e)=>setPassword(e.target.value)}
+        onChange={(e) => setPassword(e.target.value)}
+        onKeyDown={handleKeyDown}
       />
 
       <button onClick={login}>Login</button>
